@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>			
+		<script type="text/javascript">	
+      const template = data => `
+        <p>name: ${data.name}</p>
+        <p>age: ${data.profile.age}</p>
+        <ul>
+          ${data.skills.map(skill => `
+            <li>${skill}</li>
+          `).join('')}
+        </ul>`
+
+      const data = {
+        name: 'zhaomenghuan',
+        profile: { age: 24 },
+        skills: ['html5', 'javascript', 'android']
+      }
+
+      document.body.innerHTML = template(data)
+		</script>
+	</body>
+</html>

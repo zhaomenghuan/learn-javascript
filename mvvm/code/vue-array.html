@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>vue 监听数组变动</title>
+</head>
+<body>
+  <script>
+    /* ================= 数组变异方法 =================== */
+
+    const arrayProto = Array.prototype
+    const arrayMethods = Object.create(arrayProto)
+
+    function def(obj, key, val, enumerable) {
+      Object.defineProperty(obj, key, {
+        value: val,
+        enumerable: !!enumerable,
+        writable: true,
+        configurable: true
+      })
+    }
+
+    /**
+     * 数组的变异方法
+     */
+    ;[
+      'push',
+      'pop',
+      'shift',
+      'unshift',
+      'splice',
+      'sort',
+      'reverse'
+    ]
+    .forEach(function (method) {
+      // cache original method
+      var original = arrayProto[method]
+      def(arrayMethods, method, function mutator () {
+        var i = arguments.length
+        var args = new Array(i)
+        while (i--) {
+          args[i] = arguments[i]
+        }
+        console.log('数组变动')
+        return original.apply(this, args)
+      })
+    })
+
+    /* ================= Observer =================== */
+
+    const hasProto = '__proto__' in {}
+    const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
+    
+    /**
+     * 观察者构造函数
+     * 
+     * @param {Array|Object} value
+     * @constructor
+     */
+    function Observer (value) {
+      var augment = hasProto
+        ? protoAugment
+        : copyAugment
+      augment(value, arrayMethods, arrayKeys)
+      this.observeArray(value)
+    }
+
+    /**
+     * 观察数组的每一项
+     *
+     * @param {Array} items
+     */
+    Observer.prototype.observeArray = function (items) {
+      for (var i = 0, l = items.length; i < l; i++) {
+        observe(items[i])
+      }
+    }
+
+    /**
+     * 创建数据观察者实例
+     *
+     * @param {*} value
+     * @param {Vue} [vm]
+     * @return {Observer|undefined}
+     * @static
+     */
+    function observe (value) {
+      if (!value || typeof value !== 'object') {
+        return
+      }
+      return new Observer(value)
+    }
+
+    /**
+     * 将目标对象/数组的原型指针__proto__指向src
+     *
+     * @param {Object|Array} target
+     * @param {Object} src
+     */
+    function protoAugment (target, src) {
+      target.__proto__ = src
+    }
+
+    /**
+     * 将具有变异方法挂在需要追踪的对象上
+     *
+     * @param {Object|Array} target
+     * @param {Object} proto
+     */
+    function copyAugment (target, src, keys) {
+      for (var i = 0, l = keys.length; i < l; i++) {
+        var key = keys[i]
+        def(target, key, src[key])
+      }
+    }
+
+    /* ================ 测试 ================ */
+    
+    let skills = ['JavaScript', 'Node.js', 'html5']
+    observe(skills)
+
+    skills.push('java')
+    // 数组变动
+    skills.pop()
+    // 数组变动
+  </script>
+</body>
+</html>

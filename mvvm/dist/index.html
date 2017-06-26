@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>MVVM</title>
+    <style>
+        #app {
+            box-shadow: 2px 2px 8px rgb(204, 204, 204);
+            padding: 30px;
+            margin: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <h3>{{user.name}}</h3>
+        <input type="text" v-model="modelValue">
+        <p>{{modelValue}}</p>
+    </div>
+    <script src="utils.js"></script>
+    <script src="array.js"></script>
+    <script src="observer.js"></script>
+    <script src="dep.js"></script>
+    <script src="watcher.js"></script>
+    <script src="compile.js"></script>
+    <script src="mvvm.js"></script>
+    <script>
+        let vm = new MVVM({
+            el: '#app',
+            data: {
+                modelValue: '',
+                user: {
+                    name: 'zhaomenghuan',
+                    age: '24'
+                },
+                address: {
+                    city: 'beijing'
+                },
+                skills: ['JavaScript', 'Node.js', 'html5']
+            }
+        })
+
+        vm.$watch('modelValue', val => console.log(`watch modelValue ：${val}`))
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>vue 监听对象变动</title>
+</head>
+<body>
+  <script>
+    /**
+     * 观察者构造函数
+     * 
+     * @param {Array|Object} value
+     * @constructor
+     */
+    function Observer (value) {
+      this.value = value
+      this.walk(value)
+    }
+
+    /**
+     * 递归调用，为对象绑定getter/setter
+     * 
+     * @param {Object} obj
+     */
+    Observer.prototype.walk = function (obj) {
+      var keys = Object.keys(obj)
+      for (var i = 0, l = keys.length; i < l; i++) {
+        this.convert(keys[i], obj[keys[i]])
+      }
+    }
+
+    /**
+     * 将属性转换为getter/setter
+     * 
+     * @param {String} key
+     * @param {*} val
+     */
+    Observer.prototype.convert = function (key, val) {
+      defineReactive(this.value, key, val)
+    }
+
+    /**
+     * 创建数据观察者实例
+     *
+     * @param {*} value
+     * @param {Vue} [vm]
+     * @return {Observer|undefined}
+     * @static
+     */
+    function observe (value) {
+      if (!value || typeof value !== 'object') {
+        return
+      }
+      return new Observer(value)
+    }
+
+    /**
+     * 定义对象属性的getter/setter
+     *
+     * @param {Object} obj
+     * @param {String} key
+     * @param {*} val
+     */
+    function defineReactive (obj, key, val) {
+      var property = Object.getOwnPropertyDescriptor(obj, key)
+      if (property && property.configurable === false) {
+        return
+      }
+
+      // 保存对象属性预先定义的getter/setter
+      var getter = property && property.get
+      var setter = property && property.set
+
+      var childOb = observe(val)
+      Object.defineProperty(obj, key, {
+        enumerable: true,
+        configurable: true,
+        get: function reactiveGetter () {
+          var value = getter ? getter.call(obj) : val
+          console.log("访问："+key)
+          return value
+        },
+        set: function reactiveSetter (newVal) {
+          var value = getter ? getter.call(obj) : val
+          if (newVal === value) {
+            return
+          }
+          if (setter) {
+            setter.call(obj, newVal)
+          } else {
+            val = newVal
+          }
+          childOb = observe(newVal)
+          console.log('更新：' + key + ' = ' + newVal)
+        }
+      })
+    }
+
+    /* ================ 测试 ================ */
+    
+    let data = {
+      user: {
+        name: 'zhaomenghuan',
+        age: '24'
+      },
+      address: {
+        city: 'beijing'
+      }
+    }
+    observe(data)
+
+    console.log(data.user.name) 
+    // 访问：user 
+    // 访问：name
+
+    data.user.name = 'ZHAO MENGHUAN'
+    // 访问：user
+    // 更新：name = ZHAO MENGHUAN
+  </script>
+</body>
+</html>
