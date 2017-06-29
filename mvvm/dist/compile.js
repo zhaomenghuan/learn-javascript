@@ -1,5 +1,5 @@
 function Compile(el, value) {
-    this.$val = value
+    this.$vm = value
     this.$el = this.isElementNode(el) ? el : document.querySelector(el)
     if (this.$el) {
         this.compileElement(this.$el)
@@ -38,7 +38,7 @@ Compile.prototype.compile = function (node) {
             if (self.isEventDirective(dir)) {
                 compileUtil.eventHandler(node, self.$vm, exp, dir)
             } else {
-                compileUtil[dir] && compileUtil[dir](node, self.$val, exp)
+                compileUtil[dir] && compileUtil[dir](node, self.$vm, exp)
             }
             node.removeAttribute(attrName)
         }
@@ -46,7 +46,7 @@ Compile.prototype.compile = function (node) {
 }
 
 Compile.prototype.compileText = function (node, exp) {
-    compileUtil.text(node, this.$val, exp);
+    compileUtil.text(node, this.$vm, exp);
 }
 
 Compile.prototype.isDirective = function (attr) {
