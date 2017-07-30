@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>vue-dialog</title>
+  <link href="https://cdn.bootcss.com/normalize/7.0.0/normalize.css" rel="stylesheet">
+  <style>
+    /**
+    * vue-dialog
+    */
+    * {
+      margin: 0;
+  	  padding: 0;
+    }
+    .vue-dialog-mask {
+      position: fixed;
+      z-index: 9998;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, .5);
+      display: table;
+      transition: opacity .3s ease;
+    }
+
+    .vue-dialog-wrapper {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .vue-dialog {
+      width: 60%;
+      margin: 0px auto;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+      transition: all .3s ease;
+      font-family: "microsoft yahei";
+    }
+
+    .vue-dialog-title {
+      height: 40px;
+      padding: 0px 10px;
+      line-height: 40px;
+      color: #fff;
+      background-color: #000;
+    }
+
+    .vue-dialog-title h5 {
+      margin: 0;
+      padding: 0;
+      float: left;
+    }
+
+    .vue-dialog-title i {
+      float: right;
+      font-size: 20px;
+    }
+
+    .vue-dialog-content {
+      font-size: 15px;
+      padding: 30px 15px;
+    }
+
+    .vue-dialog-btns {
+      display: flex;
+      flex-flow: row;
+      text-align: center;
+    }
+
+    .vue-dialog-btns button {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 10px 0px;
+      background-color: #fff;
+      border-top: 1px solid hsl(0, 0%, 92%);
+      border-right: 1px solid hsl(0, 0%, 92%);
+    }
+
+    .vue-dialog-btns button:active {
+      background: #ecf0f1;
+    }
+
+    .vue-dialog-btns button:last-child {
+      border-right: none;
+    }
+    /*过渡效果*/
+
+    .vue-dialog-enter,
+    .vue-dialog-leave {
+      opacity: 0;
+    }
+
+    .vue-dialog-enter .vue-dialog,
+    .vue-dialog-leave .vue-dialog {
+      -webkit-transform: scale(1.1);
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <vue-dialog 
+      :show.sync="showModal"
+      :options="optionsObj" 
+      :callback="modelCallback">
+    </vue-dialog>
+    <button class="vue-btn vue-btn-block vue-btn-secondary" @click="confirm">confirm</button>
+  </div>
+
+  <script src="https://unpkg.com/vue@2.4.2"></script>
+  <script>
+
+    Vue.component('vue-dialog', {
+      template: '\
+        <transition name="vue-dialog">\
+          <div class="vue-dialog-mask" v-if="show">\
+            <div class="vue-dialog-wrapper">\
+              <div class="vue-dialog">\
+                <div v-if="!!options.title" class="vue-dialog-title" v-bind:style="options.title.style">\
+                  <h5>{{options.title.text}}</h5>\
+                  <i class="vue-icon" @click="cancel">×</i>\
+                </div>\
+                <div v-if="!!options.content" class="vue-dialog-content" v-bind:style="options.content.style" v-html="options.content.text"></div>\
+                <div v-if="!!options.btns" class="vue-dialog-btns">\
+                  <button v-for="(item, index) in options.btns"  @click="callback(index)">{{item}}</button>\
+                </div>\
+              </div>\
+            </div>\
+          </div>\
+        </transition>\
+      ',
+      props: ['show', 'options', 'callback'],
+      methods: {
+        cancel: function() {
+          this.$emit('update:show', false);
+        }
+      }
+    });
+
+    new Vue({
+      el: '#app',
+      data: {
+        showModal: false,
+        optionsObj: {
+          title: {
+            text: '我是标题',
+            style: 'background-color:#8DCE16; color:#fff;'
+          },
+          content: {
+            text: '我是第一行'
+          },
+          btns: ['取消', '确认']
+        }
+      },
+      methods: {
+        confirm: function() {
+          this.showModal = true;
+        },
+        modelCallback: function(index) {
+          alert(index);
+          this.showModal = false;
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
