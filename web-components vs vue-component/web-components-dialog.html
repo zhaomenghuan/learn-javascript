@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>web-components-dialog</title>
+  <link href="https://cdn.bootcss.com/normalize/7.0.0/normalize.css" rel="stylesheet">
+  <style>
+    web-components-dialog {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <template id="dialog-template">
+    <style>
+      /**
+      * web-components-dialog
+      */
+
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .web-components-dialog-mask {
+        position: fixed;
+        z-index: 9998;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, .5);
+        display: table;
+        transition: opacity .3s ease;
+      }
+
+      .web-components-dialog-wrapper {
+        display: table-cell;
+        vertical-align: middle;
+      }
+
+      .web-components-dialog {
+        width: 60%;
+        margin: 0px auto;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+        transition: all .3s ease;
+        font-family: "microsoft yahei";
+      }
+
+      .web-components-dialog-title {
+        height: 40px;
+        padding: 0px 10px;
+        line-height: 40px;
+        color: #fff;
+        background-color: #000;
+      }
+
+      .web-components-dialog-content {
+        font-size: 15px;
+        padding: 30px 15px;
+      }
+
+      .web-components-dialog-btns {
+        display: flex;
+        flex-flow: row;
+        text-align: center;
+      }
+
+      .web-components-dialog-btns button {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 10px 0px;
+        background-color: #fff;
+        border-top: 1px solid hsl(0, 0%, 92%);
+        border-right: 1px solid hsl(0, 0%, 92%);
+      }
+
+      .web-components-dialog-btns button:active {
+        background: #ecf0f1;
+      }
+
+      .web-components-dialog-btns button:last-child {
+        border-right: none;
+      }
+    </style>
+
+    <div class="web-components-dialog-mask">
+      <div class="web-components-dialog-wrapper">
+        <div class="web-components-dialog">
+          <div class="web-components-dialog-title"></div>
+          <div class="web-components-dialog-content"></div>
+          <div class="web-components-dialog-btns">
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <web-components-dialog 
+    id="dialog" 
+    data-title="我是标题" 
+    data-title-style="background-color: rgb(141, 206, 22); color: rgb(255, 255, 255);"
+    data-content="我是内容" 
+    data-content-style="color: #f00" 
+    data-btns="取消, 确认" 
+    data-callback="alert(index);">
+  </web-components-dialog>
+
+  <button class="show-dialog" onclick="showDialog()">show Dialog</button>
+
+  <script>
+    if ('content' in document.createElement('template')) {
+      var template = document.querySelector('#dialog-template').content;
+
+      var DialogProto = Object.create(HTMLElement.prototype);
+
+      DialogProto.createdCallback = function () {
+        // Create a Shadow Root
+        var rootShadow = this.createShadowRoot();
+        var clone = document.importNode(template, true);
+        // 设置标题
+        var titleElem = clone.querySelector('.web-components-dialog-title');
+        titleElem.textContent = this.getAttribute('data-title');
+        titleElem.style.cssText = this.getAttribute('data-title-style');
+        // 设置内容
+        var contentElem = clone.querySelector('.web-components-dialog-content');
+        contentElem.textContent = this.getAttribute('data-content');
+        contentElem.style.cssText = this.getAttribute('data-content-style');
+        // 设置按钮
+        var fragment = document.createDocumentFragment();
+        var btns = this.getAttribute('data-btns').split(',');
+        var callback = this.getAttribute('data-callback');
+        for (var i = 0; i < btns.length; i++) {
+          var btn = document.createElement("button");
+          btn.innerText = btns[i];
+          btn.index = i;
+          btn.addEventListener('click', function() {
+            (new Function("index", callback))(this.index);
+          });
+          fragment.appendChild(btn);
+        }
+        clone.querySelector('.web-components-dialog-btns').appendChild(fragment);
+        rootShadow.appendChild(clone);
+      };
+
+      document.registerElement('web-components-dialog', {
+        prototype: DialogProto
+      });
+    }
+
+    function showDialog() {
+      var dialog = document.getElementById('dialog');
+      dialog.style.display = 'block';
+    }
+  </script>
+</body>
+
+</html>
