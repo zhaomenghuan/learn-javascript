@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var xhr = new XMLHttpRequest();
+			xhr.onload = function () {
+			    console.log(this.responseText);
+			};
+			xhr.onreadystatechange = function() {
+			    console.log(this.readyState);
+			};
+			
+			xhr.open("post", "http://127.0.0.1:8080", true);
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			xhr.send("userid=xiaoqingnian");
+		</script>
+	</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>vue-simple-routing-example</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://unpkg.com/vue@2.4.2"></script>
+  <script>
+    const NotFound = { template: '<main-layout><p>Page not found</p></main-layout>' }
+    const Home = { template: '<main-layout><p>home page</p></main-layout>' }
+    const About = { template: '<main-layout><p>about page</p></main-layout>' }
+
+    const routes = {
+      '/': Home,
+      '/about': About
+    }
+
+    Vue.component('v-link', {
+      template: `
+        <a
+          v-bind:href="href"
+          v-bind:class="{ active: isActive }"
+          v-on:click="go">
+          <slot></slot>
+        </a>
+      `,
+      props: {
+        href: {
+          type:String,
+          required: true 
+        }
+      },
+      computed: {
+        isActive () {
+          return this.href === this.$root.currentRoute
+        }
+      },
+      methods: {
+        go (event) {
+          event.preventDefault()
+          this.$root.currentRoute = this.href
+          window.history.pushState(
+            null,
+            routes[this.href],
+            this.href
+          )
+        }
+      }
+    })
+
+    Vue.component('main-layout', {
+      template: `
+        <div>
+          <v-link href="/">Home</v-link>
+          <v-link href="/about">About</v-link>
+          <slot></slot>
+        </div>
+      `
+    })
+
+    new Vue({
+      el: '#app',
+      data: {
+        currentRoute: window.location.pathname
+      },
+      computed: {
+        ViewComponent () {
+          return routes[this.currentRoute] || NotFound
+        }
+      },
+      render (h) { return h(this.ViewComponent) }
+    })
+
+    window.addEventListener('popstate', () => {
+      app.currentRoute = window.location.pathname
+    })
+  </script>
+</body>
+</html>
